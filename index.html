@@ -14,7 +14,6 @@
         body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: var(--bg-base); padding: 20px; color: #333; line-height: 1.6; }
         .container { max-width: 650px; margin: auto; background: white; padding: 40px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); border-top: 10px solid var(--kcg-maroon); position: relative; }
         
-        /* SVG Logo Styling */
         .logo-container { text-align: center; margin-bottom: 20px; padding-bottom: 10px; }
         .logo-img { width: 100%; max-width: 400px; height: auto; display: block; margin: 0 auto; }
 
@@ -26,7 +25,6 @@
         input, select, textarea { width: 100%; padding: 12px; margin-top: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; font-size: 15px; background-color: #fdfdfd; }
         input:focus { border: 2px solid var(--kcg-maroon); outline: none; }
         
-        /* Step Logic */
         .step { display: none; }
         .step.active { display: block; }
         
@@ -37,10 +35,9 @@
         .btn-back { background-color: #eee; color: #555; }
         .btn-submit { background-color: var(--kcg-maroon); color: white; }
         
-        #preview-area { display: none; background: #fff; }
+        .hidden { display: none; }
         .progress-bar { height: 6px; background: #eee; margin-bottom: 25px; border-radius: 3px; overflow: hidden; }
         .progress-fill { height: 100%; background: var(--kcg-maroon); width: 33%; transition: width 0.4s ease; }
-        
         .pdf-box { padding: 20px; background: white; }
     </style>
 </head>
@@ -87,13 +84,26 @@
 
         <div class="step" id="step2">
             <label>Academic Qualification <span class="required">*</span></label>
-            <input type="text" name="qualification" required>
+            <select name="qualification" required>
+                <option value="">Select Qualification</option>
+                <option value="Bachelors">Bachelors</option>
+                <option value="Masters">Masters</option>
+            </select>
 
             <label>University/College Name <span class="required">*</span></label>
             <input type="text" name="uniName" required>
 
             <label>Total Academic Years <span class="required">*</span></label>
-            <input type="number" name="academicYears" required>
+            <select name="academicYears" id="academicYears" onchange="checkOthers(this, 'otherYearsInput')" required>
+                <option value="">Select Years</option>
+                <option value="14">14</option>
+                <option value="15">15</option>
+                <option value="16">16</option>
+                <option value="17">17</option>
+                <option value="18">18</option>
+                <option value="Others">Others</option>
+            </select>
+            <input type="text" name="otherAcademicYears" id="otherYearsInput" class="hidden" placeholder="Please specify academic years">
 
             <label>Intended Intake <span class="required">*</span></label>
             <select name="intake" required>
@@ -120,7 +130,14 @@
             <input type="text" name="city" required>
 
             <label>Current Status <span class="required">*</span></label>
-            <input type="text" name="status" required>
+            <select name="status" id="statusSelect" onchange="checkOthers(this, 'otherStatusInput')" required>
+                <option value="">Select Status</option>
+                <option value="Student">Student</option>
+                <option value="Employee">Employee</option>
+                <option value="Unemployed">Unemployed</option>
+                <option value="Others">Others</option>
+            </select>
+            <input type="text" name="otherStatus" id="otherStatusInput" class="hidden" placeholder="Please specify current status">
 
             <label>Have you ever applied to Japan before? <span class="required">*</span></label>
             <select name="appliedBefore" id="appliedBefore" onchange="toggleVisaSection()" required>
@@ -129,20 +146,20 @@
             </select>
 
             <div id="visaSection" class="hidden">
-                <label>What kind of visa? <span class="required">*</span></label>
-                <input type="text" name="visaDetails" id="visaInput">
+                <label>What kind of visa?</label>
+                <select name="visaDetails" id="visaInput">
+                    <option value="">Select Visa Type</option>
+                    <option value="Tourist Visa">Tourist Visa</option>
+                    <option value="Dependent Visa">Dependent Visa</option>
+                    <option value="Student Visa">Student Visa</option>
+                </select>
             </div>
 
             <label>Future Plan <span class="required">*</span></label>
             <textarea name="futurePlan" rows="3" required></textarea>
 
-            <label>Remarks</label>
-            <textarea name="remarks" rows="2"></textarea>
-
-            <div class="button-group">
-                <button type="button" class="btn-back" onclick="nextStep(2)">Back</button>
-                <button type="submit" class="btn-submit">Submit & Generate PDF</button>
-            </div>
+            <button type="submit" class="btn-submit">Submit & Generate PDF</button>
+            <button type="button" class="btn-back" onclick="nextStep(2)" style="margin-top:10px;">Back</button>
         </div>
     </form>
 </div>
@@ -152,10 +169,9 @@
         <img src="logo.svg" alt="KCG Logo" style="max-height: 60px; margin-bottom: 20px;">
         <h2 style="color:var(--kcg-maroon); border-bottom: 2px solid var(--kcg-maroon);">Registration Summary</h2>
         <div id="summary-output"></div>
-        <p style="margin-top: 20px; font-size: 11px; color: gray;">Submitted: <span id="subDate"></span></p>
     </div>
     <div class="button-group">
-        <button onclick="downloadPDF()" class="btn-next">Download Confirmation PDF</button>
+        <button onclick="downloadPDF()" class="btn-next">Download PDF</button>
         <button onclick="window.location.reload()" class="btn-back">New Response</button>
     </div>
 </div>
@@ -166,49 +182,48 @@
     function nextStep(stepNumber) {
         document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
         document.getElementById('step' + stepNumber).classList.add('active');
-        const progress = (stepNumber / 3) * 100;
-        document.getElementById('progressFill').style.width = progress + '%';
+        document.getElementById('progressFill').style.width = (stepNumber / 3) * 100 + '%';
         window.scrollTo(0,0);
+    }
+
+    function checkOthers(selectElement, inputId) {
+        const input = document.getElementById(inputId);
+        if (selectElement.value === 'Others') {
+            input.classList.remove('hidden');
+            input.required = true;
+        } else {
+            input.classList.add('hidden');
+            input.required = false;
+        }
     }
 
     function toggleVisaSection() {
         const isYes = document.getElementById('appliedBefore').value === 'Yes';
         document.getElementById('visaSection').classList.toggle('hidden', !isYes);
-        document.getElementById('visaInput').required = isYes;
     }
 
     document.getElementById('kcgiFullForm').addEventListener('submit', function(e) {
         e.preventDefault();
         const formData = new FormData(this);
-
         fetch(SCRIPT_URL, { method: 'POST', body: formData });
 
         let html = "";
         formData.forEach((value, key) => {
-            if(value) {
-                let label = key.replace(/([A-Z])/g, ' $1').toUpperCase();
-                html += `<p style="border-bottom: 1px solid #f1f1f1; padding: 6px 0;"><strong>${label}:</strong> ${value}</p>`;
+            if(value && !key.toLowerCase().includes('other')) {
+                html += `<p><strong>${key.replace(/([A-Z])/g, ' $1').toUpperCase()}:</strong> ${value}</p>`;
+            } else if (value && key.toLowerCase().includes('other')) {
+                html += `<p style="color:var(--kcg-maroon)"><strong>DETAIL:</strong> ${value}</p>`;
             }
         });
         document.getElementById('summary-output').innerHTML = html;
-        document.getElementById('subDate').innerText = new Date().toLocaleString();
-
         document.getElementById('form-container').style.display = 'none';
         document.getElementById('preview-area').style.display = 'block';
     });
 
     function downloadPDF() {
         const element = document.getElementById('pdf-content');
-        const opt = {
-            margin: 10,
-            filename: 'KCG_Registration_Form.pdf',
-            image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { scale: 2 },
-            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-        };
-        html2pdf().set(opt).from(element).save();
+        html2pdf().from(element).save('Registration.pdf');
     }
 </script>
-
 </body>
 </html>
