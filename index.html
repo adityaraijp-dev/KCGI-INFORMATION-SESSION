@@ -1,1 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KCGI Information Session</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f9; padding: 20px; color: #333; }
+        .card { max-width: 600px; margin: auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border-top: 8px solid #004a99; }
+        h1 { color: #004a99; text-align: center; font-size: 24px; }
+        label { display: block; margin-top: 15px; font-weight: bold; font-size: 14px; }
+        input, select, textarea { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; background: #004a99; color: white; border: none; border-radius: 4px; margin-top: 25px; cursor: pointer; font-size: 16px; font-weight: bold; }
+        button:hover { background: #003366; }
+        .hidden { display: none; }
+        #preview-area { display: none; }
+    </style>
+</head>
+<body>
 
+<div class="card" id="form-container">
+    <h1>KCGI INFORMATION SESSION</h1>
+    <p style="text-align:center; font-weight:bold;">2026 October Intake</p>
+    
+    <form id="kcgiForm">
+        <label>Email Address *</label>
+        <input type="email" name="email" required>
+
+        <label>Last Name *</label>
+        <input type="text" name="lastName" required>
+
+        <label>First and Middle Name *</label>
+        <input type="text" name="firstName" required>
+
+        <label>Gender *</label>
+        <select name="gender" required>
+            <option value="">--Select--</option>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+        </select>
+
+        <label>Nationality *</label>
+        <input type="text" name="nationality" required>
+
+        <label>Phone No *</label>
+        <input type="tel" name="phone" required>
+
+        <label>Academic Qualification *</label>
+        <input type="text" name="qualification" required placeholder="e.g. Bachelor Degree">
+
+        <label>University/College Name *</label>
+        <input type="text" name="uniName" required>
+
+        <label>Total Academic Years *</label>
+        <input type="number" name="academicYears" required>
+
+        <label>Intended Intake *</label>
+        <select name="intake" required>
+            <option value="Oct 2026">October 2026 Intake</option>
+            <option value="April 2027">April 2027 Intake</option>
+        </select>
+
+        <label>Desired Concentration *</label>
+        <select name="concentration" required>
+            <option value="ERP">ERP</option>
+            <option value="Data Science">Data Science</option>
+            <option value="Cybersecurity">Cybersecurity</option>
+            <option value="AI">Artificial Intelligence</option>
+        </select>
+
+        <label>Current City *</label>
+        <input type="text" name="city" required>
+
+        <label>Applied to Japan before? *</label>
+        <select name="appliedBefore" id="appliedBefore" onchange="toggleVisa()" required>
+            <option value="No">No</option>
+            <option value="Yes">Yes</option>
+        </select>
+
+        <div id="visaSection" class="hidden">
+            <label>What kind of visa did you apply for? *</label>
+            <input type="text" name="visaDetails" id="visaInput">
+        </div>
+
+        <label>Future Plan *</label>
+        <textarea name="futurePlan" rows="3" required></textarea>
+
+        <label>Remarks</label>
+        <textarea name="remarks" rows="2"></textarea>
+
+        <button type="submit">Submit & Generate PDF</button>
+    </form>
+</div>
+
+<div class="card" id="preview-area">
+    <div id="pdf-content">
+        <h2 style="color:#004a99; border-bottom: 2px solid #004a99; padding-bottom:10px;">Registration Summary</h2>
+        <div id="summary-data"></div>
+        <p style="margin-top:20px; font-size:12px; color:#666;">Submitted on: <span id="submitDate"></span></p>
+    </div>
+    <button onclick="downloadPDF()">Download PDF</button>
+    <button onclick="window.location.reload()" style="background:#666; margin-top:10px;">Back</button>
+</div>
+
+<script>
+   
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx1l9BDOF-UJ276PRgoY-t4J7kTS3pA0MQcc9RRlHW1o8FZ3Gu09GlDKaRJmK0tu1LX/exec';
+
+    function toggleVisa() {
+        const isYes = document.getElementById('appliedBefore').value === 'Yes';
+        document.getElementById('visaSection').classList.toggle('hidden', !isYes);
+        document.getElementById('visaInput').required = isYes;
+    }
+
+    document.getElementById('kcgiForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+
+        // 1. Send to Sheets
+        fetch(SCRIPT_URL, { method: 'POST', body: formData })
+            .then(() => console.log('Success'))
+            .catch(() => console.log('Sent to PDF only'));
+
+        // 2. Build PDF Preview
+        let html = "";
+        formData.forEach((value, key) => {
+            if(value) html += `<p><strong>${key.replace(/([A-Z])/g, ' $1').toUpperCase()}:</strong> ${value}</p>`;
+        });
+        document.getElementById('summary-data').innerHTML = html;
+        document.getElementById('submitDate').innerText = new Date().toLocaleString();
+
+        // 3. Display
+        document.getElementById('form-container').style.display = 'none';
+        document.getElementById('preview-area').style.display = 'block';
+        window.scrollTo(0,0);
+    });
+
+    function downloadPDF() {
+        const element = document.getElementById('pdf-content');
+        html2pdf().from(element).save('KCGI_Registration.pdf');
+    }
+</script>
+
+</body>
+</html>
