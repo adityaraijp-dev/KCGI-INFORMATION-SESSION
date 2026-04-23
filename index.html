@@ -14,12 +14,12 @@
         body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: var(--bg-base); padding: 20px; color: #333; line-height: 1.6; }
         .container { max-width: 650px; margin: auto; background: white; padding: 40px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); border-top: 10px solid var(--kcg-maroon); position: relative; }
         
-        /* Logo Styling */
-        .logo-container { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #eee; padding-bottom: 20px; }
-        .logo-img { max-width: 100%; height: auto; max-height: 70px; }
+        /* SVG Logo Styling */
+        .logo-container { text-align: center; margin-bottom: 20px; padding-bottom: 10px; }
+        .logo-img { width: 100%; max-width: 400px; height: auto; display: block; margin: 0 auto; }
 
-        h1 { color: var(--kcg-black); text-align: center; margin: 10px 0 5px 0; font-size: 24px; text-transform: uppercase; letter-spacing: 0.5px; }
-        .subtitle { text-align: center; font-weight: bold; margin-bottom: 30px; color: #555; font-size: 15px; }
+        h1 { color: var(--kcg-black); text-align: center; margin: 10px 0 5px 0; font-size: 22px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .subtitle { text-align: center; font-weight: bold; margin-bottom: 30px; color: #555; font-size: 14px; border-bottom: 1px solid #eee; padding-bottom: 20px; }
         
         label { display: block; margin-top: 20px; font-weight: 600; font-size: 14px; color: var(--kcg-black); }
         .required { color: var(--kcg-maroon); }
@@ -35,7 +35,6 @@
         .btn-next { background-color: var(--kcg-maroon); color: white; }
         .btn-next:hover { opacity: 0.85; }
         .btn-back { background-color: #eee; color: #555; }
-        .btn-back:hover { background-color: #e0e0e0; }
         .btn-submit { background-color: var(--kcg-maroon); color: white; }
         
         #preview-area { display: none; background: #fff; }
@@ -49,8 +48,7 @@
 
 <div class="container" id="form-container">
     <div class="logo-container">
-        <img src="logo.png" alt="KCG.edu Logo" class="logo-img" onerror="this.style.display='none'; document.getElementById('logo-fallback').style.display='block';">
-        <h2 id="logo-fallback" style="display:none; color:var(--kcg-maroon);">kcg.edu</h2>
+        <img src="logo.svg" alt="KCG Logo" class="logo-img">
     </div>
 
     <h1>KCGI INFORMATION SESSION</h1>
@@ -89,7 +87,7 @@
 
         <div class="step" id="step2">
             <label>Academic Qualification <span class="required">*</span></label>
-            <input type="text" name="qualification" required placeholder="e.g., Bachelor Degree in CS">
+            <input type="text" name="qualification" required>
 
             <label>University/College Name <span class="required">*</span></label>
             <input type="text" name="uniName" required>
@@ -122,7 +120,7 @@
             <input type="text" name="city" required>
 
             <label>Current Status <span class="required">*</span></label>
-            <input type="text" name="status" required placeholder="e.g., Working, Final Year Student">
+            <input type="text" name="status" required>
 
             <label>Have you ever applied to Japan before? <span class="required">*</span></label>
             <select name="appliedBefore" id="appliedBefore" onchange="toggleVisaSection()" required>
@@ -136,7 +134,7 @@
             </div>
 
             <label>Future Plan <span class="required">*</span></label>
-            <textarea name="futurePlan" rows="3" required placeholder="e.g., Work as a Data Analyst in Japan."></textarea>
+            <textarea name="futurePlan" rows="3" required></textarea>
 
             <label>Remarks</label>
             <textarea name="remarks" rows="2"></textarea>
@@ -151,7 +149,7 @@
 
 <div class="container" id="preview-area" style="background: white; border-top: 10px solid var(--kcg-maroon);">
     <div id="pdf-content" class="pdf-box">
-        <img src="logo.png" alt="KCG Logo" style="max-height: 50px; margin-bottom: 20px;">
+        <img src="logo.svg" alt="KCG Logo" style="max-height: 60px; margin-bottom: 20px;">
         <h2 style="color:var(--kcg-maroon); border-bottom: 2px solid var(--kcg-maroon);">Registration Summary</h2>
         <div id="summary-output"></div>
         <p style="margin-top: 20px; font-size: 11px; color: gray;">Submitted: <span id="subDate"></span></p>
