@@ -14,8 +14,9 @@
         body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: var(--bg-base); padding: 20px; color: #333; line-height: 1.6; }
         .container { max-width: 650px; margin: auto; background: white; padding: 40px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); border-top: 10px solid var(--kcg-maroon); position: relative; }
         
+        /* Logo Styles */
         .logo-container { text-align: center; margin-bottom: 20px; padding-bottom: 10px; }
-        .logo-img { width: 100%; max-width: 350px; height: auto; display: block; margin: 0 auto; }
+        .logo-img { width: 300px; height: auto; display: block; margin: 0 auto; }
 
         h1 { color: var(--kcg-black); text-align: center; margin: 10px 0 5px 0; font-size: 22px; text-transform: uppercase; letter-spacing: 0.5px; }
         .subtitle { text-align: center; font-weight: bold; margin-bottom: 30px; color: #555; font-size: 14px; border-bottom: 1px solid #eee; padding-bottom: 20px; }
@@ -37,11 +38,22 @@
         .progress-bar { height: 6px; background: #eee; margin-bottom: 25px; border-radius: 3px; overflow: hidden; }
         .progress-fill { height: 100%; background: var(--kcg-maroon); width: 33%; transition: width 0.4s ease; }
         
+        /* Specific PDF Formatting */
         #preview-area { display: none; }
-        #pdf-content { padding: 40px; background: white; width: 100%; box-sizing: border-box; }
-        .summary-item { border-bottom: 1px solid #f1f1f1; padding: 10px 0; font-size: 14px; display: flex; }
+        #pdf-wrap { background: white; padding: 0; } /* Wrapper to ensure no background bleed */
+        #pdf-content { 
+            padding: 50px; 
+            background: white; 
+            width: 100%; 
+            box-sizing: border-box;
+            min-height: 800px;
+        }
+        .summary-item { border-bottom: 1px solid #f1f1f1; padding: 12px 0; font-size: 14px; display: flex; align-items: flex-start; }
         .summary-item strong { color: var(--kcg-maroon); width: 220px; flex-shrink: 0; }
-        .summary-value { flex-grow: 1; }
+        .summary-value { flex-grow: 1; color: #333; }
+        
+        .pdf-header { text-align: center; margin-bottom: 30px; border-bottom: 3px solid var(--kcg-maroon); padding-bottom: 20px; }
+        .pdf-logo { width: 280px; height: auto; margin: 0 auto 15px auto; display: block; }
     </style>
 </head>
 <body>
@@ -130,70 +142,7 @@
 </div>
 
 <div class="container" id="preview-area">
-    <div id="pdf-content">
-        <img src="logo.svg" style="width: 300px; height: auto; display: block; margin: 0 auto 30px auto;">
-        <h2 style="color:var(--kcg-maroon); border-bottom: 2px solid var(--kcg-maroon); text-align: center; padding-bottom: 10px; margin-bottom: 20px;">REGISTRATION SUMMARY</h2>
-        <div id="summary-output"></div>
-        <p style="margin-top: 40px; font-size: 10px; color: #999; text-align: center; border-top: 1px solid #eee; padding-top: 10px;">The Kyoto College of Graduate Studies for Informatics</p>
-    </div>
-    <div class="button-group">
-        <button onclick="downloadPDF()" class="btn-next">Download PDF</button>
-        <button onclick="window.location.reload()" class="btn-back">Start New</button>
-    </div>
-</div>
-
-<script>
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx1l9BDOF-UJ276PRgoY-t4J7kTS3pA0MQcc9RRlHW1o8FZ3Gu09GlDKaRJmK0tu1LX/exec';
-
-    function nextStep(n) {
-        document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
-        document.getElementById('step' + n).classList.add('active');
-        document.getElementById('progressFill').style.width = (n / 3) * 100 + '%';
-        window.scrollTo(0,0);
-    }
-
-    function checkOthers(s, id) {
-        const input = document.getElementById(id);
-        input.classList.toggle('hidden', s.value !== 'Others');
-        input.required = (s.value === 'Others');
-    }
-
-    function toggleVisaSection() {
-        document.getElementById('visaSection').classList.toggle('hidden', document.getElementById('appliedBefore').value !== 'Yes');
-    }
-
-    document.getElementById('kcgiFullForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        const formData = new FormData(this);
-        fetch(SCRIPT_URL, { method: 'POST', body: formData });
-
-        let html = "";
-        formData.forEach((value, key) => {
-            if (value && !key.toLowerCase().includes('other')) {
-                let label = key.replace(/([A-Z])/g, ' $1').toUpperCase();
-                let val = (value === 'Others') ? (formData.get('otherStatus') || formData.get('otherYears')) : value;
-                html += `<div class="summary-item"><strong>${label}:</strong><span class="summary-value">${val}</span></div>`;
-            }
-        });
-
-        document.getElementById('summary-output').innerHTML = html;
-        document.getElementById('form-container').style.display = 'none';
-        document.getElementById('preview-area').style.display = 'block';
-    });
-
-    function downloadPDF() {
-        const element = document.getElementById('pdf-content');
-        const opt = {
-            margin: [15, 15],
-            filename: 'KCGI_Registration.pdf',
-            image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { scale: 3, useCORS: true },
-            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-        };
-        setTimeout(() => {
-            html2pdf().set(opt).from(element).save();
-        }, 500);
-    }
-</script>
-</body>
-</html>
+    <div id="pdf-wrap">
+        <div id="pdf-content">
+            <div class="pdf-header">
+                <img src="
