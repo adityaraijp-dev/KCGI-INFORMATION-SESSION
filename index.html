@@ -25,6 +25,7 @@
         input, select, textarea { width: 100%; padding: 12px; margin-top: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; font-size: 15px; background-color: #fdfdfd; }
         input:focus, select:focus { border: 2px solid var(--kcg-maroon); outline: none; }
         
+        /* Step Logic */
         .step { display: none; }
         .step.active { display: block; }
         
@@ -38,7 +39,12 @@
         .hidden { display: none; }
         .progress-bar { height: 6px; background: #eee; margin-bottom: 25px; border-radius: 3px; overflow: hidden; }
         .progress-fill { height: 100%; background: var(--kcg-maroon); width: 33%; transition: width 0.4s ease; }
-        .pdf-box { padding: 20px; background: white; }
+        
+        /* Final Summary Page Styling */
+        #preview-area { display: none; }
+        .pdf-box { padding: 20px; background: white; border: 1px solid #eee; }
+        .summary-item { border-bottom: 1px solid #f1f1f1; padding: 8px 0; font-size: 14px; }
+        .summary-item strong { color: var(--kcg-maroon); display: inline-block; width: 200px; }
     </style>
 </head>
 <body>
@@ -106,7 +112,7 @@
             <input type="text" name="otherYears" id="otherYearsInput" class="hidden" placeholder="Specify years">
 
             <label>Desired Concentration <span class="required">*</span></label>
-            <select name="concentration" onchange="checkOthers(this, 'otherConcInput')" required>
+            <select name="concentration" required>
                 <option value="">Select Concentration</option>
                 <option value="Artificial Intelligence">1. Artificial Intelligence</option>
                 <option value="Data Science">2. Data Science</option>
@@ -117,9 +123,7 @@
                 <option value="IT Manga & Anime">7. IT Manga & Anime</option>
                 <option value="IT Tourism">8. IT Tourism</option>
                 <option value="IT Entertainment">9. IT Entertainment</option>
-                <option value="Others">Others</option>
             </select>
-            <input type="text" name="otherConcentration" id="otherConcInput" class="hidden" placeholder="Specify concentration">
 
             <div class="button-group">
                 <button type="button" class="btn-back" onclick="nextStep(1)">Back</button>
@@ -148,9 +152,9 @@
             </select>
 
             <div id="visaSection" class="hidden">
-                <label>What kind of visa?</label>
+                <label>What kind of visa? (Optional)</label>
                 <select name="visaDetails">
-                    <option value="">Select Visa Type (Optional)</option>
+                    <option value="N/A">Select Visa Type</option>
                     <option value="Tourist Visa">Tourist Visa</option>
                     <option value="Dependent Visa">Dependent Visa</option>
                     <option value="Student Visa">Student Visa</option>
@@ -159,7 +163,7 @@
             </div>
 
             <label>Future Plan <span class="required">*</span></label>
-            <textarea name="futurePlan" rows="3" required placeholder="What are your goals after graduation?"></textarea>
+            <textarea name="futurePlan" rows="3" required placeholder="Goals after graduation..."></textarea>
 
             <div class="button-group">
                 <button type="button" class="btn-back" onclick="nextStep(2)">Back</button>
@@ -169,15 +173,16 @@
     </form>
 </div>
 
-<div class="container" id="preview-area" style="background: white; border-top: 10px solid var(--kcg-maroon);">
+<div class="container" id="preview-area">
     <div id="pdf-content" class="pdf-box">
-        <img src="logo.svg" alt="KCG Logo" style="max-height: 60px; margin-bottom: 20px;">
-        <h2 style="color:var(--kcg-maroon); border-bottom: 2px solid var(--kcg-maroon);">Registration Summary</h2>
-        <div id="summary-output"></div>
+        <img src="logo.svg" alt="KCG Logo" style="max-height: 50px; margin-bottom: 20px; display: block; margin-left: auto; margin-right: auto;">
+        <h2 style="color:var(--kcg-maroon); border-bottom: 2px solid var(--kcg-maroon); text-align: center; padding-bottom: 10px;">REGISTRATION SUMMARY</h2>
+        <div id="summary-output" style="margin-top: 20px;"></div>
+        <p style="margin-top: 30px; font-size: 11px; color: #888; text-align: center;">Thank you for your interest in KCGI.</p>
     </div>
     <div class="button-group">
-        <button onclick="downloadPDF()" class="btn-next">Download PDF</button>
-        <button onclick="window.location.reload()" class="btn-back">New Response</button>
+        <button onclick="downloadPDF()" class="btn-next">Download Confirmation PDF</button>
+        <button onclick="window.location.reload()" class="btn-back">New Submission</button>
     </div>
 </div>
 
@@ -209,4 +214,44 @@
 
     document.getElementById('kcgiFullForm').addEventListener('submit', function(e) {
         e.preventDefault();
-        const
+        const formData = new FormData(this);
+        
+        // Send to Google Sheets
+        fetch(SCRIPT_URL, { method: 'POST', body: formData });
+
+        // Build the Summary for the last page
+        let html = "";
+        formData.forEach((value, key) => {
+            // Logic to skip showing "Other" inputs separately if they are empty
+            if (value && !key.toLowerCase().includes('other')) {
+                let displayKey = key.replace(/([A-Z])/g, ' $1').toUpperCase();
+                // Special check to combine 'Others' dropdown with the actual text typed
+                let displayValue = value;
+                if (value === 'Others') {
+                    if (key === 'academicYears') displayValue = formData.get('otherYears');
+                    if (key === 'status') displayValue = formData.get('otherStatus');
+                }
+                html += `<div class="summary-item"><strong>${displayKey}:</strong> ${displayValue}</div>`;
+            }
+        });
+
+        document.getElementById('summary-output').innerHTML = html;
+        document.getElementById('form-container').style.display = 'none';
+        document.getElementById('preview-area').style.display = 'block';
+        window.scrollTo(0,0);
+    });
+
+    function downloadPDF() {
+        const element = document.getElementById('pdf-content');
+        const opt = {
+            margin: 10,
+            filename: 'KCGI_Registration.pdf',
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2 },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
+        html2pdf().set(opt).from(element).save();
+    }
+</script>
+</body>
+</html>
