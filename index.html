@@ -3,71 +3,171 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KCGI Registration</title>
+    <title>KCGI Information Session - Registration</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
-        body { font-family: sans-serif; background: #eef2f7; padding: 20px; }
-        .card { background: white; max-width: 600px; margin: auto; padding: 30px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        h1 { color: #004a99; margin-top: 0; }
-        label { display: block; margin-top: 15px; font-weight: bold; }
-        input, select, textarea { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
-        button { width: 100%; padding: 12px; background: #004a99; color: white; border: none; border-radius: 4px; margin-top: 20px; cursor: pointer; font-size: 16px; }
+        :root { --kcgi-blue: #004a99; --bg-gray: #f0f2f5; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: var(--bg-gray); padding: 20px; color: #333; line-height: 1.6; }
+        .container { max-width: 650px; margin: auto; background: white; padding: 40px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); border-top: 10px solid var(--kcgi-blue); }
+        h1 { color: var(--kcgi-blue); text-align: center; margin-bottom: 5px; font-size: 26px; }
+        .subtitle { text-align: center; font-weight: bold; margin-bottom: 30px; color: #555; }
+        .section-header { background: #eef4fb; padding: 10px; font-weight: bold; color: var(--kcgi-blue); margin: 30px 0 15px 0; border-left: 4px solid var(--kcgi-blue); }
+        label { display: block; margin-top: 20px; font-weight: 600; font-size: 14px; }
+        .required { color: #d93025; }
+        input, select, textarea { width: 100%; padding: 12px; margin-top: 8px; border: 1px solid #dadce0; border-radius: 4px; box-sizing: border-box; font-size: 15px; }
+        button { background-color: var(--kcgi-blue); color: white; padding: 15px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; font-weight: bold; width: 100%; margin-top: 30px; }
+        button:hover { background-color: #003366; }
+        .hidden { display: none; }
         #preview-area { display: none; }
+        .pdf-box { padding: 20px; border: 1px solid #eee; }
     </style>
 </head>
 <body>
 
-<div class="card" id="form-container">
+<div class="container" id="form-container">
     <h1>KCGI INFORMATION SESSION</h1>
-    <form id="kcgiForm">
-        <label>Email Address</label>
+    <p class="subtitle">2026 October Intake</p>
+    
+    <form id="kcgiFullForm">
+        <div class="section-header">Section 1: Personal Information</div>
+        
+        <label>Email Address <span class="required">*</span></label>
         <input type="email" name="email" required>
 
-        <label>Full Name</label>
-        <input type="text" name="fullName" required>
+        <label>Last Name <span class="required">*</span></label>
+        <input type="text" name="lastName" required>
 
-        <label>Nationality</label>
-        <input type="text" name="nationality" required>
+        <label>First and Middle Name <span class="required">*</span></label>
+        <input type="text" name="firstName" required>
 
-        <label>Intended Intake</label>
-        <select name="intake">
-            <option>October 2026</option>
-            <option>April 2027</option>
+        <label>Gender <span class="required">*</span></label>
+        <select name="gender" required>
+            <option value="">Select</option>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+            <option value="Other">Other</option>
         </select>
 
-        <button type="submit">Submit & Preview PDF</button>
+        <label>Nationality <span class="required">*</span></label>
+        <input type="text" name="nationality" required>
+
+        <label>Phone Number <span class="required">*</span></label>
+        <input type="tel" name="phone" required>
+
+        <div class="section-header">Section 2: Academic Background</div>
+
+        <label>Academic Qualification <span class="required">*</span></label>
+        <input type="text" name="qualification" placeholder="e.g., Bachelor Degree" required>
+
+        <label>University/College Name <span class="required">*</span></label>
+        <input type="text" name="uniName" required>
+
+        <label>Total Academic Years <span class="required">*</span></label>
+        <input type="number" name="academicYears" required>
+
+        <div class="section-header">Section 3: Enrollment Details</div>
+
+        <label>Intended Intake <span class="required">*</span></label>
+        <select name="intake" required>
+            <option value="Oct 2026">October 2026</option>
+            <option value="April 2027">April 2027</option>
+        </select>
+
+        <label>Desired Concentration <span class="required">*</span></label>
+        <select name="concentration" required>
+            <option value="ERP">ERP</option>
+            <option value="Data Science">Data Science</option>
+            <option value="Cybersecurity">Cybersecurity</option>
+            <option value="Animation/CG">Animation/CG</option>
+            <option value="Business IT">Business IT</option>
+        </select>
+
+        <label>Current City <span class="required">*</span></label>
+        <input type="text" name="city" required>
+
+        <label>Current Status <span class="required">*</span></label>
+        <input type="text" name="status" placeholder="e.g., Student, Working" required>
+
+        <label>Have you ever applied to Japan before? <span class="required">*</span></label>
+        <select name="appliedBefore" id="appliedBefore" onchange="toggleVisaSection()" required>
+            <option value="No">No</option>
+            <option value="Yes">Yes</option>
+        </select>
+
+        <div id="visaSection" class="hidden">
+            <label>What kind of visa? <span class="required">*</span></label>
+            <input type="text" name="visaDetails" id="visaInput">
+        </div>
+
+        <div class="section-header">Section 4: Future Plans</div>
+        
+        <label>Future Plan <span class="required">*</span></label>
+        <textarea name="futurePlan" rows="3" required></textarea>
+
+        <label>Remarks</label>
+        <textarea name="remarks" rows="2"></textarea>
+
+        <button type="submit">Submit & Generate PDF</button>
     </form>
 </div>
 
-<div class="card" id="preview-area">
-    <h2>Submission Preview</h2>
-    <div id="output"></div>
+<div class="container" id="preview-area">
+    <div id="pdf-content" class="pdf-box">
+        <h2 style="color:var(--kcgi-blue); border-bottom: 2px solid var(--kcgi-blue);">KCGI REGISTRATION SUMMARY</h2>
+        <div id="summary-output" style="margin-top: 20px;"></div>
+        <p style="margin-top: 30px; font-size: 12px; color: #888;">Submission Date: <span id="subDate"></span></p>
+    </div>
     <button onclick="downloadPDF()">Download PDF</button>
+    <button onclick="window.location.reload()" style="background:#666; margin-top:10px;">New Response</button>
 </div>
 
 <script>
-    // Replace the URL below with your Google Script URL
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx1l9BDOF-UJ276PRgoY-t4J7kTS3pA0MQcc9RRlHW1o8FZ3Gu09GlDKaRJmK0tu1LX/exec';
 
-    document.getElementById('kcgiForm').onsubmit = function(e) {
+    function toggleVisaSection() {
+        const isYes = document.getElementById('appliedBefore').value === 'Yes';
+        document.getElementById('visaSection').classList.toggle('hidden', !isYes);
+        document.getElementById('visaInput').required = isYes;
+    }
+
+    document.getElementById('kcgiFullForm').addEventListener('submit', function(e) {
         e.preventDefault();
         const formData = new FormData(this);
-        
-        // Show Preview
+
+        // 1. Send to Sheets
+        fetch(SCRIPT_URL, { method: 'POST', body: formData })
+            .then(() => console.log('Google Sheets Updated'))
+            .catch(err => console.error('Sheet update failed', err));
+
+        // 2. Map data for PDF preview
         let html = "";
-        formData.forEach((v, k) => { html += `<p><b>${k}:</b> ${v}</p>`; });
-        document.getElementById('output').innerHTML = html;
+        formData.forEach((value, key) => {
+            if(value) {
+                let label = key.replace(/([A-Z])/g, ' $1').toUpperCase();
+                html += `<p style="margin-bottom:8px;"><strong>${label}:</strong> ${value}</p>`;
+            }
+        });
+        document.getElementById('summary-output').innerHTML = html;
+        document.getElementById('subDate').innerText = new Date().toLocaleString();
+
+        // 3. Switch View
         document.getElementById('form-container').style.display = 'none';
         document.getElementById('preview-area').style.display = 'block';
-
-        // Send to Sheets
-        fetch(SCRIPT_URL, { method: 'POST', body: formData }).catch(err => console.log(err));
-    };
+        window.scrollTo(0,0);
+    });
 
     function downloadPDF() {
-        const element = document.getElementById('preview-area');
-        html2pdf().from(element).save('KCGI_Registration.pdf');
+        const element = document.getElementById('pdf-content');
+        const opt = {
+            margin: 10,
+            filename: 'KCGI_Registration.pdf',
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2 },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
+        html2pdf().set(opt).from(element).save();
     }
 </script>
+
 </body>
 </html>
