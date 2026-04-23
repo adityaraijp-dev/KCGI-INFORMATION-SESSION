@@ -3,23 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KCGI Information Session - Registration</title>
+    <title>KCGI Information Session</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
-        :root { --kcgi-blue: #004a99; --bg-gray: #f0f2f5; }
-        body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: var(--bg-gray); padding: 20px; color: #333; line-height: 1.6; }
-        .container { max-width: 650px; margin: auto; background: white; padding: 40px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); border-top: 10px solid var(--kcgi-blue); }
-        h1 { color: var(--kcgi-blue); text-align: center; margin-bottom: 5px; font-size: 26px; }
-        .subtitle { text-align: center; font-weight: bold; margin-bottom: 30px; color: #555; }
-        .section-header { background: #eef4fb; padding: 10px; font-weight: bold; color: var(--kcgi-blue); margin: 30px 0 15px 0; border-left: 4px solid var(--kcgi-blue); }
-        label { display: block; margin-top: 20px; font-weight: 600; font-size: 14px; }
+        :root { 
+            --deep-green: #86af49; 
+            --light-green: #b5e7a0;
+            --muted-gray: #d5e1df;
+            --pale-yellow: #e3eaa7;
+        }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: var(--muted-gray); padding: 20px; color: #333; line-height: 1.6; }
+        .container { max-width: 650px; margin: auto; background: var(--pale-yellow); padding: 40px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border-top: 10px solid var(--deep-green); position: relative; }
+        h1 { color: var(--deep-green); text-align: center; margin-bottom: 5px; font-size: 24px; text-transform: uppercase; letter-spacing: 1px; }
+        .subtitle { text-align: center; font-weight: bold; margin-bottom: 30px; color: #5d6d45; border-bottom: 1px solid rgba(0,0,0,0.1); padding-bottom: 15px; }
+        
+        label { display: block; margin-top: 20px; font-weight: 600; font-size: 14px; color: #4a5d2e; }
         .required { color: #d93025; }
-        input, select, textarea { width: 100%; padding: 12px; margin-top: 8px; border: 1px solid #dadce0; border-radius: 4px; box-sizing: border-box; font-size: 15px; }
-        button { background-color: var(--kcgi-blue); color: white; padding: 15px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; font-weight: bold; width: 100%; margin-top: 30px; }
-        button:hover { background-color: #003366; }
-        .hidden { display: none; }
-        #preview-area { display: none; }
-        .pdf-box { padding: 20px; border: 1px solid #eee; }
+        input, select, textarea { width: 100%; padding: 12px; margin-top: 8px; border: 1px solid #c2c99a; border-radius: 4px; box-sizing: border-box; font-size: 15px; background-color: #fdfdf5; }
+        input:focus { border: 2px solid var(--deep-green); outline: none; }
+        
+        /* Step Logic */
+        .step { display: none; }
+        .step.active { display: block; }
+        
+        .button-group { display: flex; gap: 10px; margin-top: 30px; }
+        button { flex: 1; padding: 15px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; font-weight: bold; transition: 0.3s; }
+        .btn-next { background-color: var(--deep-green); color: white; }
+        .btn-next:hover { background-color: #6b8e3a; }
+        .btn-back { background-color: #9eadba; color: white; }
+        .btn-submit { background-color: var(--deep-green); color: white; }
+        
+        #preview-area { display: none; background: #fff; }
+        .progress-bar { height: 6px; background: #c2c99a; margin-bottom: 25px; border-radius: 3px; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--deep-green); width: 33%; transition: width 0.4s ease; }
+        
+        .pdf-box { padding: 20px; background: white; border-radius: 8px; }
     </style>
 </head>
 <body>
@@ -28,101 +46,121 @@
     <h1>KCGI INFORMATION SESSION</h1>
     <p class="subtitle">2026 October Intake</p>
     
+    <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+
     <form id="kcgiFullForm">
-        <div class="section-header">Section 1: Personal Information</div>
-        
-        <label>Email Address <span class="required">*</span></label>
-        <input type="email" name="email" required>
+        <div class="step active" id="step1">
+            <label>Email Address <span class="required">*</span></label>
+            <input type="email" name="email" required>
 
-        <label>Last Name <span class="required">*</span></label>
-        <input type="text" name="lastName" required>
+            <label>Last Name <span class="required">*</span></label>
+            <input type="text" name="lastName" required>
 
-        <label>First and Middle Name <span class="required">*</span></label>
-        <input type="text" name="firstName" required>
+            <label>First and Middle Name <span class="required">*</span></label>
+            <input type="text" name="firstName" required>
 
-        <label>Gender <span class="required">*</span></label>
-        <select name="gender" required>
-            <option value="">Select</option>
-            <option value="Male">Male</option>
-            <option value="Female">Female</option>
-            <option value="Other">Other</option>
-        </select>
+            <label>Gender <span class="required">*</span></label>
+            <select name="gender" required>
+                <option value="">Select</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+            </select>
 
-        <label>Nationality <span class="required">*</span></label>
-        <input type="text" name="nationality" required>
+            <label>Nationality <span class="required">*</span></label>
+            <input type="text" name="nationality" required>
 
-        <label>Phone Number <span class="required">*</span></label>
-        <input type="tel" name="phone" required>
+            <label>Phone Number <span class="required">*</span></label>
+            <input type="tel" name="phone" required>
 
-        <div class="section-header">Section 2: Academic Background</div>
-
-        <label>Academic Qualification <span class="required">*</span></label>
-        <input type="text" name="qualification" placeholder="e.g., Bachelor Degree" required>
-
-        <label>University/College Name <span class="required">*</span></label>
-        <input type="text" name="uniName" required>
-
-        <label>Total Academic Years <span class="required">*</span></label>
-        <input type="number" name="academicYears" required>
-
-        <div class="section-header">Section 3: Enrollment Details</div>
-
-        <label>Intended Intake <span class="required">*</span></label>
-        <select name="intake" required>
-            <option value="Oct 2026">October 2026</option>
-            <option value="April 2027">April 2027</option>
-        </select>
-
-        <label>Desired Concentration <span class="required">*</span></label>
-        <select name="concentration" required>
-            <option value="ERP">ERP</option>
-            <option value="Data Science">Data Science</option>
-            <option value="Cybersecurity">Cybersecurity</option>
-            <option value="Animation/CG">Animation/CG</option>
-            <option value="Business IT">Business IT</option>
-        </select>
-
-        <label>Current City <span class="required">*</span></label>
-        <input type="text" name="city" required>
-
-        <label>Current Status <span class="required">*</span></label>
-        <input type="text" name="status" placeholder="e.g., Student, Working" required>
-
-        <label>Have you ever applied to Japan before? <span class="required">*</span></label>
-        <select name="appliedBefore" id="appliedBefore" onchange="toggleVisaSection()" required>
-            <option value="No">No</option>
-            <option value="Yes">Yes</option>
-        </select>
-
-        <div id="visaSection" class="hidden">
-            <label>What kind of visa? <span class="required">*</span></label>
-            <input type="text" name="visaDetails" id="visaInput">
+            <div class="button-group">
+                <button type="button" class="btn-next" onclick="nextStep(2)">Next</button>
+            </div>
         </div>
 
-        <div class="section-header">Section 4: Future Plans</div>
-        
-        <label>Future Plan <span class="required">*</span></label>
-        <textarea name="futurePlan" rows="3" required></textarea>
+        <div class="step" id="step2">
+            <label>Academic Qualification <span class="required">*</span></label>
+            <input type="text" name="qualification" required>
 
-        <label>Remarks</label>
-        <textarea name="remarks" rows="2"></textarea>
+            <label>University/College Name <span class="required">*</span></label>
+            <input type="text" name="uniName" required>
 
-        <button type="submit">Submit & Generate PDF</button>
+            <label>Total Academic Years <span class="required">*</span></label>
+            <input type="number" name="academicYears" required>
+
+            <label>Intended Intake <span class="required">*</span></label>
+            <select name="intake" required>
+                <option value="Oct 2026">October 2026</option>
+                <option value="April 2027">April 2027</option>
+            </select>
+
+            <label>Desired Concentration <span class="required">*</span></label>
+            <select name="concentration" required>
+                <option value="ERP">ERP</option>
+                <option value="Data Science">Data Science</option>
+                <option value="Cybersecurity">Cybersecurity</option>
+                <option value="Animation/CG">Animation/CG</option>
+            </select>
+
+            <div class="button-group">
+                <button type="button" class="btn-back" onclick="nextStep(1)">Back</button>
+                <button type="button" class="btn-next" onclick="nextStep(3)">Next</button>
+            </div>
+        </div>
+
+        <div class="step" id="step3">
+            <label>Current City <span class="required">*</span></label>
+            <input type="text" name="city" required>
+
+            <label>Current Status <span class="required">*</span></label>
+            <input type="text" name="status" required>
+
+            <label>Have you ever applied to Japan before? <span class="required">*</span></label>
+            <select name="appliedBefore" id="appliedBefore" onchange="toggleVisaSection()" required>
+                <option value="No">No</option>
+                <option value="Yes">Yes</option>
+            </select>
+
+            <div id="visaSection" class="hidden">
+                <label>What kind of visa? <span class="required">*</span></label>
+                <input type="text" name="visaDetails" id="visaInput">
+            </div>
+
+            <label>Future Plan <span class="required">*</span></label>
+            <textarea name="futurePlan" rows="3" required></textarea>
+
+            <label>Remarks</label>
+            <textarea name="remarks" rows="2"></textarea>
+
+            <div class="button-group">
+                <button type="button" class="btn-back" onclick="nextStep(2)">Back</button>
+                <button type="submit" class="btn-submit">Submit & Generate PDF</button>
+            </div>
+        </div>
     </form>
 </div>
 
-<div class="container" id="preview-area">
+<div class="container" id="preview-area" style="background: white; border-top: 10px solid var(--deep-green);">
     <div id="pdf-content" class="pdf-box">
-        <h2 style="color:var(--kcgi-blue); border-bottom: 2px solid var(--kcgi-blue);">KCGI REGISTRATION SUMMARY</h2>
-        <div id="summary-output" style="margin-top: 20px;"></div>
-        <p style="margin-top: 30px; font-size: 12px; color: #888;">Submission Date: <span id="subDate"></span></p>
+        <h2 style="color:var(--deep-green); border-bottom: 2px solid var(--deep-green);">Registration Summary</h2>
+        <div id="summary-output"></div>
+        <p style="margin-top: 20px; font-size: 11px; color: gray;">Submitted on: <span id="subDate"></span></p>
     </div>
-    <button onclick="downloadPDF()">Download PDF</button>
-    <button onclick="window.location.reload()" style="background:#666; margin-top:10px;">New Response</button>
+    <div class="button-group">
+        <button onclick="downloadPDF()" class="btn-next">Download PDF</button>
+        <button onclick="window.location.reload()" class="btn-back">New Response</button>
+    </div>
 </div>
 
 <script>
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx1l9BDOF-UJ276PRgoY-t4J7kTS3pA0MQcc9RRlHW1o8FZ3Gu09GlDKaRJmK0tu1LX/exec';
+
+    function nextStep(stepNumber) {
+        document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+        document.getElementById('step' + stepNumber).classList.add('active');
+        const progress = (stepNumber / 3) * 100;
+        document.getElementById('progressFill').style.width = progress + '%';
+        window.scrollTo(0,0);
+    }
 
     function toggleVisaSection() {
         const isYes = document.getElementById('appliedBefore').value === 'Yes';
@@ -134,26 +172,20 @@
         e.preventDefault();
         const formData = new FormData(this);
 
-        // 1. Send to Sheets
-        fetch(SCRIPT_URL, { method: 'POST', body: formData })
-            .then(() => console.log('Google Sheets Updated'))
-            .catch(err => console.error('Sheet update failed', err));
+        fetch(SCRIPT_URL, { method: 'POST', body: formData });
 
-        // 2. Map data for PDF preview
         let html = "";
         formData.forEach((value, key) => {
             if(value) {
                 let label = key.replace(/([A-Z])/g, ' $1').toUpperCase();
-                html += `<p style="margin-bottom:8px;"><strong>${label}:</strong> ${value}</p>`;
+                html += `<p style="border-bottom: 1px solid #eee; padding: 5px 0;"><strong>${label}:</strong> ${value}</p>`;
             }
         });
         document.getElementById('summary-output').innerHTML = html;
         document.getElementById('subDate').innerText = new Date().toLocaleString();
 
-        // 3. Switch View
         document.getElementById('form-container').style.display = 'none';
         document.getElementById('preview-area').style.display = 'block';
-        window.scrollTo(0,0);
     });
 
     function downloadPDF() {
